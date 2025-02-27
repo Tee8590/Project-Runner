@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
@@ -24,7 +24,8 @@ public class TrackManager : MonoBehaviour
     private Vector3 currentTileDirection = Vector3.forward;
     private GameObject prevTile;
 
-    private List<GameObject> currentTile;
+    //private List<GameObject> currentTile;
+    private Queue<GameObject> currentTile = new Queue<GameObject>();
     private List<GameObject> tilePool;
     private List<GameObject> currentObstacles;
 
@@ -33,7 +34,7 @@ public class TrackManager : MonoBehaviour
 
     void Start()
     {
-        currentTile      = new List<GameObject>();
+        currentTile      = new Queue<GameObject>();
 
         currentObstacles = new List<GameObject>();
 
@@ -57,26 +58,25 @@ public class TrackManager : MonoBehaviour
    public void SpawnTiles(Tile tile, bool SpawnObstacles)
     {
         prevTile = GameObject.Instantiate(tile.gameObject, currentTileLocation, Quaternion.identity);
-        currentTile.Add(prevTile);
+        currentTile.Enqueue(prevTile);
         currentTileLocation += Vector3.Scale(prevTile.GetComponent<Renderer>().bounds.size, currentTileDirection);
     }
     public void MoveTile()
     {
-        foreach (GameObject tile in currentTile)
+        int queueCount = currentTile.Count;
+
+        for (int i = 0; i < queueCount; i++)
         {
+            GameObject tile = currentTile.Dequeue(); //Removes the first tile
             tile.transform.Translate(-tile.transform.forward * Time.deltaTime * moveSpeed, Space.World);
-           if(mainCam.WorldToViewportPoint(tile.transform.position).z < 0)
-           {
-                GameObject tileTmp = tile;
-                int currentIndex = (currentTile.IndexOf(tile));
-                currentTile.RemoveAt(currentIndex);
+
+            if (mainCam.WorldToViewportPoint(tile.transform.position).z < 0)
+            {
+                // Move the tile to the end of the queue
                 Vector3 newPos = new Vector3(0, 0, 20);
-                tileTmp.transform.position = currentTile[currentTile.Count - 1].transform.position + newPos ;
-                currentTile.Add(tileTmp);
-                
-              
-              
+                tile.transform.position = currentTile.Last().transform.position + newPos; //Places tile at the end of queue
             }
-        } 
+            currentTile.Enqueue(tile); //Adds the tile back to the queue
+        }
     }
 }
