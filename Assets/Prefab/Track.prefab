@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2466741317376346444}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: StartPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 18025414541428265}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: SpawnPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -75,7 +75,7 @@ GameObject:
   - component: {fileID: 2594481960592747466}
   - component: {fileID: 2345701156049176882}
   - component: {fileID: 422641199074397807}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Track
   m_TagString: Untagged
   m_Icon: {fileID: 0}

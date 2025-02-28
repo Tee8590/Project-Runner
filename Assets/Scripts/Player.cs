@@ -18,9 +18,12 @@ public class Player : MonoBehaviour
     private int crouchDuration = 3;
     private Vector3 originalSize;
     Quaternion defaultPos;
+    public LayerMask obstacleLayer;
 
+    public PlayerAnimation playerAnimation;
     void Start()
     {
+        playerAnimation = GetComponent<PlayerAnimation>();
         cr = GetComponent<CharacterController>();
         col = cr.GetComponent<CapsuleCollider>();
         defaultPos = transform.rotation;
@@ -28,6 +31,8 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        
+        playerAnimation.SetRunning(true);
         InputSystem();
     }
 
@@ -40,10 +45,16 @@ public class Player : MonoBehaviour
             velocity.y = -2f;
 
         if (Input.GetKey(KeyCode.W) && isGrounded)
+        {
             Jump();
+            playerAnimation.Jumping(true);
+        }
 
         if (Input.GetKey(KeyCode.S))
+        {
             StartCoroutine(Crouch());
+            playerAnimation.Sliding(true);
+        }
 
         if (Input.GetKey(KeyCode.D))
             MoveRight();
@@ -82,5 +93,17 @@ public class Player : MonoBehaviour
     void ApplyGravity()
     {
         velocity.y += gravity * Time.deltaTime;
+    }
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        Debug.Log("dd");
+        if (((1 << hit.collider.gameObject.layer) & obstacleLayer) != 0)
+        {
+            GameOver();
+        }
+    }
+    private void GameOver()
+    {
+        Debug.Log("GameOver");
     }
 }
