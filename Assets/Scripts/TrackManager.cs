@@ -78,8 +78,10 @@ public class TrackManager : MonoBehaviour
 
            if (tile.transform.position.z <= -10f)
             {
-                 // Remove obstacles before moving the tile
+                // Remove obstacles before moving the tile
                 //DeActivatePreviousObs();
+
+                
                 // Move the tile to the end of the queue
                 Vector3 newPos = new Vector3(0, 0, 20);
                 tile.transform.position = currentTile.Last().transform.position + newPos; //Places tile at the end of queue
@@ -108,13 +110,27 @@ public class TrackManager : MonoBehaviour
         return list[Random.Range(0, list.Count)];
     }
    
-    private void DeActivatePreviousObs()
-    {
-        while(currentObstacles.Count != 0)
-        {
-            GameObject obstacle = currentObstacles[0];
-            currentObstacles.RemoveAt(0);
-            Destroy(obstacle);
-        }
-    }
+    //private void DeActivatePreviousObs()
+    //{
+        
+    //    while(currentObstacles.Count != 0)
+    //    {
+    //        Debug.Log(currentObstacles.Count);
+            //for(int i =0; i <currentObstacles.Count; i++)
+            //{
+            //    if (currentObstacles[i].gameObject.transform.position.z ==-10f)
+            //    {
+            //        GameObject obstacle = currentObstacles[i];
+            //        currentObstacles.RemoveAt(i);
+            //        Destroy(obstacle);
+            //    }
+            //}
+        //}
+        //while(currentObstacles.Count != 0)
+        //{
+        //    GameObject obstacle = currentObstacles[0];
+        //    currentObstacles.RemoveAt(0);
+        //    Destroy(obstacle);
+        //}
+    //}
 }

@@ -96,7 +96,7 @@ public class Player : MonoBehaviour
     }
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        Debug.Log("dd");
+        
         if (((1 << hit.collider.gameObject.layer) & obstacleLayer) != 0)
         {
             GameOver();
