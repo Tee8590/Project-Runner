@@ -5,19 +5,23 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
-    [SerializeField]
-    private Transform startPos;
-    [SerializeField]
-    private Transform spawnPos;
+    //[SerializeField]
+    //private Transform startPos;
+    //[SerializeField]
+    //private Transform spawnPos;
 
     private Vector3 TileLocation;
     public GameObject coinPrefab;
     public int coinSpawnTimer = 10;
     private float timer = 0f;
+
+    public GameObject obstaclePrefab;
+    private Vector3 obsScale;
     void Start()
     {
+        obsScale = obstaclePrefab.transform.localScale;
         //GameObject  renderer = gameObject.GetComponent<Renderer>(); 
-
+        SpawnObs();
         SpawnCoins();
     }
 
@@ -28,8 +32,10 @@ public class Tile : MonoBehaviour
         timer += Time.deltaTime;
         if (timer > coinSpawnTimer)
         {
+            SpawnObs();
             SpawnCoins();
             timer = 0f;
+           
         }
     }
     void SpawnCoins()
@@ -57,5 +63,12 @@ public class Tile : MonoBehaviour
         point.y = 1;
         return point;
 
+    }
+    void SpawnObs()
+    {
+        int obstacleIndex = Random.Range(0, 3);
+        Transform spawnPoint = transform.GetChild(obstacleIndex).transform;
+        GameObject obstacle = Instantiate(obstaclePrefab, spawnPoint.position, Quaternion.identity);
+        obstacle.transform.SetParent(transform, true);
     }
 }

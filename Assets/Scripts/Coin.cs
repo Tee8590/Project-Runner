@@ -19,7 +19,7 @@ public class Coin : MonoBehaviour
         }
         if(other.gameObject.name == "Kill")
         {
-            Debug.Log("Killed");
+            Debug.Log("Coin Killed");
             Destroy(gameObject);
         }
         if(other.gameObject.name != "Player")

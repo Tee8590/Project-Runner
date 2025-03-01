@@ -9,6 +9,7 @@ public class PlayerAnimation : MonoBehaviour
     public int isSlidingHash;
     public int isJumpingHash;
 
+    
     void Start()
     {
         animator = GetComponent<Animator>();

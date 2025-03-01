@@ -7,12 +7,20 @@ public class Obstacles : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.name == "Kill")
+        {
+            Debug.Log(gameObject.name);
+            Destroy(gameObject);
+        }
     }
 }

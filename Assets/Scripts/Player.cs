@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
-
+using UnityEngine.InputSystem.XR;
+using UnityEngine.UI;
 public class Player : MonoBehaviour
 {
     private Vector3 moveDirection;
@@ -11,50 +12,53 @@ public class Player : MonoBehaviour
     public float gravity = -9.81f;
     public float jumpHeight = 1.0f;
     private Vector3 velocity;
-    private bool isGrounded;
+    public bool isGrounded;
 
     private CapsuleCollider col;
     float crouchTime = 0f;
     private int crouchDuration = 3;
     private Vector3 originalSize;
     Quaternion defaultPos;
-    public LayerMask obstacleLayer;
-
+    private bool isSliding = false;
     public PlayerAnimation playerAnimation;
+    public Enemy enemy;
+
+    public Image h1;
+    public Image h2;
+    public Image h3;
+    public int health = 3;
     void Start()
     {
-        playerAnimation = GetComponent<PlayerAnimation>();
         cr = GetComponent<CharacterController>();
         col = cr.GetComponent<CapsuleCollider>();
+
+        playerAnimation = GetComponent<PlayerAnimation>();
         defaultPos = transform.rotation;
+        enemy = GameObject.FindGameObjectWithTag("enemy").GetComponent<Enemy>();
+        
     }
 
     void Update()
     {
-        
-        playerAnimation.SetRunning(true);
+        if (gameObject.transform.position.y < -1)
+        {
+            GameManager.instance.GameOver();
+            return;
+        }
         InputSystem();
+        Jump();
     }
 
     void InputSystem()
     {
         moveDirection = Vector3.zero;
-        isGrounded = cr.isGrounded;
+        
 
         if (isGrounded && velocity.y < 0)
             velocity.y = -2f;
 
-        if (Input.GetKey(KeyCode.W) && isGrounded)
-        {
-            Jump();
-            playerAnimation.Jumping(true);
-        }
-
         if (Input.GetKey(KeyCode.S))
-        {
-            StartCoroutine(Crouch());
-            playerAnimation.Sliding(true);
-        }
+           StartCoroutine(Crouch());
 
         if (Input.GetKey(KeyCode.D))
             MoveRight();
@@ -62,21 +66,34 @@ public class Player : MonoBehaviour
         if (Input.GetKey(KeyCode.A))
             MoveLeft();
 
-        ApplyGravity();
+        
         cr.Move(moveDirection + (velocity * Time.deltaTime));
     }
 
     void Jump()
     {
-        velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        isGrounded = cr.isGrounded;
+
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f; // Small value to keep the character grounded
+        }
+        if (Input.GetKey(KeyCode.Space) && isGrounded)
+        {
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        }
+
+        velocity.y += gravity * Time.deltaTime;
+        cr.Move(velocity * Time.deltaTime);
     }
 
     IEnumerator Crouch()
     {
-        if (!isGrounded) yield break;
+        playerAnimation.Sliding(true);
+        
         cr.gameObject.transform.rotation = Quaternion.Euler(-90, defaultPos.y, defaultPos.z);
         yield return new WaitForSeconds(crouchDuration);
-        if (!isGrounded) yield break;
+        
         cr.gameObject.transform.rotation = Quaternion.Euler(0, defaultPos.y, defaultPos.z);
     }
 
@@ -89,21 +106,45 @@ public class Player : MonoBehaviour
     {
         moveDirection -= transform.right * acceleration * Time.deltaTime;
     }
-
-    void ApplyGravity()
+    private void OnCollisionEnter(Collision collision)
     {
-        velocity.y += gravity * Time.deltaTime;
-    }
-    private void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        
-        if (((1 << hit.collider.gameObject.layer) & obstacleLayer) != 0)
+        if (collision.gameObject.GetComponent<Obstacles>()) 
         {
-            GameOver();
+
+           
+            TakeDamage();
         }
+       
+
     }
-    private void GameOver()
+    public void TakeDamage()
     {
-        Debug.Log("GameOver");
+        if (health <= 0)
+        {
+            GameManager.instance.GameOver();
+            return; // Exit to prevent further changes
+        }
+        
+
+        if (health == 3)
+            h3.color = Color.black;
+        else if (health == 2)
+            h2.color = Color.black;
+        else if (health == 1)
+            h1.color = Color.black;
+
+        health--; 
+        MoveEnemyCloser();
+        if (health < 0)
+            GameManager.instance.GameOver();
     }
+    void MoveEnemyCloser()
+    {
+        float moveCloserAmount = 2f; // Adjust this value to control movement step
+        Vector3 newPosition = enemy.transform.position + new Vector3(0, 0, moveCloserAmount);
+        enemy.transform.position = newPosition;
+
+        Debug.Log("Enemy moved closer to player: " + enemy.transform.position);
+    }
+
 }
